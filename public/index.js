@@ -1,10 +1,14 @@
 import React from './react.js';
 import ReactDOM from './react-dom.js';
 
-import { Provider } from './react-redux.js';
-import store from './store.js'
+import { Provider, connect } from './react-redux.js';
+import store from './store.js';
 
 const e = React.createElement;
+
+const upvoteAction = () => ({
+    type: 'upvote',
+});
 
 class LikeButton extends React.Component {
     constructor() {
@@ -13,12 +17,22 @@ class LikeButton extends React.Component {
     }
 
     render() {
-        return e(Provider, { store }, e(
+        return e(
             'button',
-            { onClick: () => this.setState({ likes: this.state.likes + 1 }) },
-            `Like ${this.state.likes}`
-        ));
+            { onClick: () => this.props.dispatch(upvoteAction()) },
+            `Like ${this.props.likes}`
+        );
     }
 }
 
-ReactDOM.render(e(LikeButton), document.body);
+const connectedLikeButton = connect(({likes}) => ({likes}))(LikeButton);
+
+class App extends React.Component {
+    render() {
+        return (
+            e(Provider, { store }, e(connectedLikeButton))
+        );
+    }
+}
+
+ReactDOM.render(e(App), document.body);
